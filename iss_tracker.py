@@ -1,5 +1,6 @@
 from flask import Flask, request
-import requests, xmltodict, math
+from geopy.geocoders import Nominatim
+import requests, xmltodict, math, time
 
 app = Flask(__name__)
 
@@ -24,7 +25,8 @@ def delete_data() -> str:
 @app.route('/post-data', methods=['POST'])
 def post_data() -> str:
     """
-    This function reloads the DATA dictionary object with the data from the web.
+    This function reloads the DATA dictionary object with the data from the website so that it can always
+    use the most updated data set.
 
     Returns:
         message (str): Message saying that the data was successfully reloaded.
@@ -43,8 +45,9 @@ def post_data() -> str:
 @app.route('/', methods=['GET'])
 def data() -> dict:
     """
-    This function imports the data into the data variable directly from the website so that it can always
-    use the most updated data set. Then it returns the said data in the form of a dictionary.
+    This function returns the data in the form of a dictionary. If it hasn't been posted at all yet, it will
+    return a message saying that it doesn't exist. If it has been posted, it will print the data and if the
+    delete method was called, it will return a blank dictionary.
 
     Returns:
         data (dict): The entire iss data.
@@ -57,6 +60,76 @@ def data() -> dict:
         return 'The data set does not exist yet!\n'
 
     return DATA
+
+@app.route('/comment', methods=['GET'])
+def get_comment() -> list:
+    """
+
+    """
+    #try-except block that makes sure it returns a message if the data is empty or doesn't exist
+    try:
+        #stores the entire epoch data by navigating through the entire data dictionary
+        comment = data()['ndm']['oem']['body']['segment']['data']['COMMENT']
+    except TypeError:
+        return 'The data set does not exist yet!\n'
+    except KeyError:
+        return 'The data is empty!\n'
+
+    return comment
+
+@app.route('/header', methods=['GET'])
+def get_header() -> dict:
+    """
+
+    """
+    #try-except block that makes sure it returns a message if the data is empty or doesn't exist
+    try:
+        #stores the entire epoch data by navigating through the entire data dictionary
+        header = data()['ndm']['oem']['header']
+    except TypeError:
+        return 'The data set does not exist yet!\n'
+    except KeyError:
+        return 'The data is empty!\n'
+
+    return header
+
+@app.route('/metadata', methods=['GET'])
+def get_metadata() -> dict:
+    """
+
+    """
+    #try-except block that makes sure it returns a message if the data is empty or doesn't exist
+    try:
+        #stores the entire epoch data by navigating through the entire data dictionary
+        metadata = data()['ndm']['oem']['body']['segment']['metadata']
+    except TypeError:
+        return 'The data set does not exist yet!\n'
+    except KeyError:
+        return 'The data is empty!\n'
+
+    return metadata
+
+@app.route('/now', methods=['GET'])
+def current_location() -> dict:
+    """
+
+    """
+
+    listOfEpochs = epoch_data()
+
+    timeNow = time.time()
+    timeEpoch = time.mktime(time.strptime(listOfEpochs[0][:-5], '%Y-%jT%H:%M:%S'))
+    closestEpoch = listOfEpochs[0]
+    previousDifference = abs(timeNow - timeEpoch)
+    
+    for epoch in listOfEpochs:
+        timeEpoch = time.mktime(time.strptime(epoch[:-5], '%Y-%jT%H:%M:%S'))
+        difference = abs(timeNow - timeEpoch)
+        if difference < previousDifference:
+            closestEpoch = epoch
+            previousDifference = difference
+
+    return location(closestEpoch)
 
 @app.route('/epochs', methods=['GET'])
 def epoch_data() -> list:
@@ -94,7 +167,7 @@ def epoch_data() -> list:
 
     #for loop that stores the requested Epoch data
     for i in range(limit):
-        results.append(listOfEpochs[i+offset])
+        results.append(listOfEpochs[i+offset]['EPOCH'])
     
     return results
 
@@ -110,12 +183,10 @@ def specific_epoch_data(epoch: str) -> dict:
         epochData (dict): The epoch data for the given epoch key.
     """
 
-    #stores the list of epochs using the pre-existing function
-    listOfEpochs = epoch_data()
-
     #try-except block to make sure the data has information
     try:
-        listOfEpochs[0]['EPOCH']
+        #stores the list of epochs
+        listOfEpochs = data()['ndm']['oem']['body']['segment']['data']['stateVector']
     except TypeError:
         return 'The data seems to be empty or does not exist...\n'
 
@@ -126,6 +197,54 @@ def specific_epoch_data(epoch: str) -> dict:
 
     #if it doesn't find it, returns this prompt
     return 'Could not find the epoch for the given key.\n'
+
+@app.route('/epochs/<string:epoch>/location', methods=['GET'])
+def location(epoch: str) -> dict:
+    """
+
+    """
+
+    specificEpoch = specific_epoch_data(epoch)
+
+    MEAN_EARTH_RADIUS = 6371
+    
+    try:
+        x = float(specificEpoch['X']['#text'])
+        y = float(specificEpoch['Y']['#text'])
+        z = float(specificEpoch['Z']['#text'])
+        units = specificEpoch['X']['@units']
+        epoch = specificEpoch['EPOCH']
+    except TypeError:
+        return 'The data seems to be empty or does not exist...\n'
+
+    hrs = int(epoch[9:11])
+    mins = int(epoch[12:14])
+    lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))
+    lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 32
+    alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS 
+
+    if lat > 180:
+        lat = lat - 360
+    if lon > 180:
+        lon = lon - 360
+
+    geocoder = Nominatim(user_agent='iss_tracker')
+    try:
+        geoloc = geocoder.reverse((lat, lon), zoom = 10, language = 'en')
+    except Error as e:
+        return f'Geopy returned an error - {e}\n'
+
+    try:
+        geoloc = geoloc.raw
+    except AttributeError:
+        geoloc = 'The ISS must be over an ocean...'
+
+
+    speed = calculate_epoch_speed(epoch)['speed']
+    
+    epochLocation = {'Epoch': epoch, 'Location': {'latitude': lat, 'longitude': lon, 'altitude': {'value': alt, 'units': units}}, 'geo': geoloc, 'speed': speed}
+    
+    return epochLocation
 
 @app.route('/epochs/<string:epoch>/speed', methods=['GET'])
 def calculate_epoch_speed(epoch: str) -> dict:
@@ -159,7 +278,8 @@ def calculate_epoch_speed(epoch: str) -> dict:
     #calculates the speed using the magnitude of a vector formula
     speed = math.sqrt(xDot**2 + yDot**2 + zDot**2)
 
-    return f'Speed: {str(speed)} {units}\n'
+    output = {'speed': {'value': speed, 'units': units}}
+    return output
 
 @app.route('/help', methods=['GET'])
 def help() -> str:
