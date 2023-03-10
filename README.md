@@ -26,6 +26,7 @@ This homework contains the script ``iss_tracker.py``. This script is a flask app
   - ``delete_data()``, ``post_data()``, ``data()``, ``get_comment()``, ``get_header()``, ``get_metadata()``, ``current_location()``, ``epoch_data()``, ``specific_epoch_data()``, ``location()``, ``calculate_epoch_speed()``, and ``help()``.
 > The functions correspond to the queries in the "Queries To Use" section, respectively.
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 # Image Handling
 ## Pulling the image ```jaeestee/iss_tracker``` from Docker Hub:
 To pull the existing image, run this command:
@@ -42,6 +43,7 @@ $ docker images
 > jaeestee/iss_tracker   latest    d8276d24fa21   2 hours ago     897MB
 > ```
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## Running the image:
 To start running the containerized Flask app, run this command:
 ```bash
@@ -66,6 +68,7 @@ flask-app_1  |  * Debugger PIN: 125-216-670
 Now the app is running!
 > **IMPORTANT: Have this running on a separate window and keep it running while sending queries!!!**
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## Building a New Image:
 To build a new image from the **Dockerfile** present in this directory, run this command:
 ```
@@ -98,6 +101,7 @@ Successfully tagged jaeestee/iss_tracker:test
 ```
 Now you have successfully created your own image!
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 # Queries To Use While The App is Running:
 ## To load/reload the data, run this command:
 ```bash
@@ -108,6 +112,7 @@ If done properly, the output should look like this:
 Successfully reloaded the dictionary with the data from the web!
 ```
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To delete the data, run this command:
 ```bash
 $ curl localhost:5000/delete-data -X DELETE
@@ -117,6 +122,7 @@ If done properly, the output should look like this:
 Successfully deleted all the data from the dictionary!
 ```
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To print the entire data set (whether it exists or is empty), run this command:
 ```bash
 $ curl localhost:5000/
@@ -159,6 +165,7 @@ The data set does not exist yet!
 ```
 > This means that the DELETE method was called, emptying the data.
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To print the comments in the data, run this command:
 ```bash
 $ curl localhost:5000/comment
@@ -200,6 +207,7 @@ If done properly, the output should look similar to this:
 ```
 > A message will appear if the data is empty or doesn't exist yet.
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To print the header in the data, run this command:
 ```bash
 $ curl localhost:5000/header
@@ -213,6 +221,7 @@ If done properly, the output should look similar to this:
 ```
 > A message will appear if the data is empty or doesn't exist yet.
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To print the metadata in the data, run this command:
 ```bash
 $ curl localhost:5000/metadata
@@ -231,6 +240,7 @@ If done properly, the output should look similar to this:
 ```
 > A message will appear if the data is empty or doesn't exist yet.
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To print the current location of the ISS, run this command:
 ```bash
 $ curl localhost:5000/now
@@ -258,6 +268,7 @@ If done properly, the output should look similar to this:
 
 > You can use this website, [ISS Real Time Tracker](https://www.n2yo.com/?s=90027), to check that the latitude and longitude given in the output is similar to the latitude and longitude of the website's tracker.
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To print out a list of all Epochs in the data set, run this command:
 ```bash
 $ curl localhost:5000/epochs
@@ -285,6 +296,7 @@ If done properly, the end of the output should look similar to this:
 > ```
 > where limit prints out a specific number of Epochs and offset changes the starting point.
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To print a specific Epoch, run this command:
 ```bash
 $ curl localhost:5000/epochs/<epochKey>
@@ -325,6 +337,7 @@ If done properly, the output should look similar to this:
 ```
 > A message will appear if the data is empty or doesn't exist yet.
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To print the location of a specific Epoch, run this command:
 ```bash
 $ curl localhost:5000/epochs/2023-063T12:00:00.000Z/location
@@ -350,6 +363,7 @@ If done properly, the output should look similar to this:
 ```
 > A message will appear if the data is empty or doesn't exist yet.
 
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
 ## To print the speed of a specific Epoch, run this command:
 ```bash
 $ curl localhost:5000/epochs/2023-063T12:00:00.000Z/speed
@@ -368,3 +382,5 @@ If done properly, the output should look similar to this:
 # Describing the ISS Data:
 An Epoch is simply a point in time that the ISS is at. It is represented in 3D cartesian coordinates (X, Y, and Z components), as well the corresponding vector components (X_DOT, Y_DOT, and Z_DOT). The units of the coordinates are kilometers, while the vector components are in kilometers per second. Lastly, the Epoch Key (example: 2023-063T12:00:00.000Z) represents the year, date, and time, in that exact order.
 > From the [NASA ISS Trajectory Data Website](https://spotthestation.nasa.gov/trajectory_data.cfm)
+  
+> Back up to [Navigation](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#navigation)
