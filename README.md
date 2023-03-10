@@ -5,42 +5,46 @@
 This homework contains the script ``iss_tracker.py``. This script is a flask application that is used to return data from the iss trajectory data. The data returned is explained in the sections below.
 
 ***iss_tracker.py***
-- This flask app contains functions that are called when queries are sent to the running app, therefore returning values that were requested. The functions are ``data()``, ``epoch_data()``, ``specific_epoch_data()``, and ``calculate_epoch_speed()``.
-> The functions correspond to the queries down below, respectively.
+- This flask app contains functions that are called when queries are sent to the running app, therefore returning values that were requested. The functions are:
+  - ``delete_data()``, ``post_data()``, ``data()``, ``get_comment()``, ``get_header()``, ``get_metadata()``, ``current_location()``, ``epoch_data()``, ``specific_epoch_data()``, ``location()``, ``calculate_epoch_speed()``, and ``help()``.
+> The functions correspond to the queries in the "Queries To Use" section, respectively.
 
 # Image Handling
 ## Pulling the image ```jaeestee/iss_tracker``` from Docker Hub:
 To pull the existing image, run this command:
 ```bash
-$ docker pull jaeestee/iss_tracker:hw05
+$ docker pull jaeestee/iss_tracker
 ```
-If done properly, ``jaeestee/iss_tracker`` should show up with the tag ``hw05`` when running this command:
+If done properly, ``jaeestee/iss_tracker`` should show up with the tag ``latest`` when running this command:
 ```bash
 $ docker images
 ```
 > The output should look similar to this:
 > ```
 > REPOSITORY             TAG       IMAGE ID       CREATED         SIZE
-> jaeestee/iss_tracker   hw05      d8276d24fa21   2 hours ago     897MB
+> jaeestee/iss_tracker   latest    d8276d24fa21   2 hours ago     897MB
 > ```
 
 ## Running the image:
 To start running the containerized Flask app, run this command:
 ```bash
-docker run -it --rm -p 5000:5000 jaeestee/iss_tracker:hw05
+docker-compose up
 ```
+> Remember that the docker-compose.yml file must exist in the same folder for this to work!
 If done properly, the output should look similar to this:
 ```
- * Serving Flask app 'iss_tracker'
- * Debug mode: on
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on all addresses (0.0.0.0)
- * Running on http://127.0.0.1:5000
- * Running on http://172.17.0.2:5000
-Press CTRL+C to quit
- * Restarting with stat
- * Debugger is active!
- * Debugger PIN: 953-963-822
+Starting iss-tracker_flask-app_1 ... done
+Attaching to iss-tracker_flask-app_1
+flask-app_1  |  * Serving Flask app 'iss_tracker'
+flask-app_1  |  * Debug mode: on
+flask-app_1  | WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+flask-app_1  |  * Running on all addresses (0.0.0.0)
+flask-app_1  |  * Running on http://127.0.0.1:5000
+flask-app_1  |  * Running on http://172.19.0.2:5000
+flask-app_1  | Press CTRL+C to quit
+flask-app_1  |  * Restarting with stat
+flask-app_1  |  * Debugger is active!
+flask-app_1  |  * Debugger PIN: 125-216-670
 ```
 Now the app is running!
 > **IMPORTANT: Have this running on a separate window and keep it running while sending queries!!!**
@@ -78,12 +82,32 @@ Successfully tagged jaeestee/iss_tracker:test
 Now you have successfully created your own image!
 
 # Queries To Use While The App is Running:
-## To print the entire data set, run this command:
+## To load/reload the data, run this command:
+```bash
+$ curl localhost:5000/post-data -X POST
+```
+If done properly, the output should look like this:
+```
+Successfully reloaded the dictionary with the data from the web!
+```
+
+## To delete the data, run this command:
+```bash
+$ curl localhost:5000/delete-data -X DELETE
+```
+If done properly, the output should look like this:
+```
+Successfully deleted all the data from the dictionary!
+```
+
+## To print the entire data set (whether it exists or is empty), run this command:
 ```bash
 $ curl localhost:5000/
 ```
 > This will send a get request using curl to the app that should be running.
-If done properly (**WITH THE APP RUNNING**), the end of the output should look similar to this:
+
+If done properly (**WITH THE APP RUNNING ON A SEPARATE TAB**), the end of the output should look similar to one of these 3 outputs:
+- Output possibility 1:
 ```
 "metadata": {
             "CENTER_NAME": "EARTH",
@@ -105,6 +129,117 @@ If done properly (**WITH THE APP RUNNING**), the end of the output should look s
 }
 ```
 > This will print out the entire data set, but as long as you see the metadata section, it printed everything properly.
+- Output possibility 2:
+
+```
+The data set does not exist yet!
+```
+> This means that the POST method has not been called.
+
+- Output possibility 3:
+```
+{}
+```
+> This means that the DELETE method was called, emptying the data.
+
+## To print the comments in the data, run this command:
+```bash
+$ curl localhost:5000/comment
+```
+If done properly, the output should look similar to this:
+```
+[
+  "Units are in kg and m^2",
+  "MASS=473291.00",
+  "DRAG_AREA=1421.50",
+  "DRAG_COEFF=2.80",
+  "SOLAR_RAD_AREA=0.00",
+  "SOLAR_RAD_COEFF=0.00",
+  "Orbits start at the ascending node epoch",
+  "ISS first asc. node: EPOCH = 2023-03-08T12:50:10.295 $ ORBIT = 2617 $ LAN(DEG) = 108.61247",
+  "ISS last asc. node : EPOCH = 2023-03-23T11:58:44.947 $ ORBIT = 2849 $ LAN(DEG) = 32.65474",
+  "Begin sequence of events",
+  "TRAJECTORY EVENT SUMMARY:",
+  null,
+  "|       EVENT        |       TIG        | ORB |   DV    |   HA    |   HP    |",
+  "|                    |       GMT        |     |   M/S   |   KM    |   KM    |",
+  "|                    |                  |     |  (F/S)  |  (NM)   |  (NM)   |",
+  "=============================================================================",
+  "GMT067 Reboost        067:19:47:00.000             0.6     428.1     408.4",
+  "(2.0)   (231.1)   (220.5)",
+  null,
+  "Crew05 Undock         068:22:00:00.000             0.0     428.7     409.6",
+  "(0.0)   (231.5)   (221.2)",
+  null,
+  "SpX27 Launch          074:00:30:00.000             0.0     428.3     408.7",
+  "(0.0)   (231.2)   (220.7)",
+  null,
+  "SpX27 Docking         075:12:00:00.000             0.0     428.2     408.6",
+  "(0.0)   (231.2)   (220.6)",
+  null,
+  "=============================================================================",
+  "End sequence of events"
+]
+```
+> A message will appear if the data is empty or doesn't exist yet.
+
+## To print the header in the data, run this command:
+```bash
+$ curl localhost:5000/header
+```
+If done properly, the output should look similar to this:
+```
+{
+  "CREATION_DATE": "2023-067T21:02:49.080Z",
+  "ORIGINATOR": "JSC"
+}
+```
+> A message will appear if the data is empty or doesn't exist yet.
+
+## To print the metadata in the data, run this command:
+```bash
+$ curl localhost:5000/metadata
+```
+If done properly, the output should look similar to this:
+```
+{
+  "CENTER_NAME": "EARTH",
+  "OBJECT_ID": "1998-067-A",
+  "OBJECT_NAME": "ISS",
+  "REF_FRAME": "EME2000",
+  "START_TIME": "2023-067T12:00:00.000Z",
+  "STOP_TIME": "2023-082T12:00:00.000Z",
+  "TIME_SYSTEM": "UTC"
+}
+```
+> A message will appear if the data is empty or doesn't exist yet.
+
+## To print the current location of the ISS, run this command:
+```bash
+$ curl localhost:5000/now
+```
+If done properly, the output should look similar to this:
+```
+{
+  "Epoch": "2023-069T06:48:00.000Z",
+  "Location": {
+    "altitude": {
+      "units": "km",
+      "value": 419.7851549137822
+    },
+    "latitude": 28.659367107265545,
+    "longitude": -126.3121600929075
+  },
+  "geo": "The ISS must be over an ocean...",
+  "speed": {
+    "units": "km/s",
+    "value": 7.666292075028554
+  }
+}
+```
+> A message will appear if the data is empty or doesn't exist yet.
+
+> You can use this website, [ISS Real Time Tracker](https://www.n2yo.com/?s=90027), to check that the latitude and longitude given in the output is similar to the latitude and longitude of the website's tracker.
 
 ## To print out a list of all Epochs in the data set, run this command:
 ```bash
@@ -112,34 +247,21 @@ $ curl localhost:5000/epochs
 ```
 If done properly, the end of the output should look similar to this:
 ```
-"EPOCH": "2023-063T12:00:00.000Z",
-    "X": {
-      "#text": "2820.04422055639",
-      "@units": "km"
-    },
-    "X_DOT": {
-      "#text": "5.0375825820999403",
-      "@units": "km/s"
-    },
-    "Y": {
-      "#text": "-5957.89709645725",
-      "@units": "km"
-    },
-    "Y_DOT": {
-      "#text": "0.78494316057540003",
-      "@units": "km/s"
-    },
-    "Z": {
-      "#text": "1652.0698653803699",
-      "@units": "km"
-    },
-    "Z_DOT": {
-      "#text": "-5.7191913150960803",
-      "@units": "km/s"
-    }
-  }
+  "2023-082T11:20:00.000Z",
+  "2023-082T11:24:00.000Z",
+  "2023-082T11:28:00.000Z",
+  "2023-082T11:32:00.000Z",
+  "2023-082T11:36:00.000Z",
+  "2023-082T11:40:00.000Z",
+  "2023-082T11:44:00.000Z",
+  "2023-082T11:48:00.000Z",
+  "2023-082T11:52:00.000Z",
+  "2023-082T11:56:00.000Z",
+  "2023-082T12:00:00.000Z"
 ]
 ```
+> A message will appear if the data is empty or doesn't exist yet. Additionally, there should be a lot more data points, this is a shortened version.
+
 > It is also possible to use the query parameters ``limit`` and ``offset``:
 > ```
 > $ curl localhost:5000/epochs?limit=<int>'&'offset=<int>
@@ -148,7 +270,7 @@ If done properly, the end of the output should look similar to this:
 
 ## To print a specific Epoch, run this command:
 ```bash
-$ curl localhost:5000/epochs/epochKey
+$ curl localhost:5000/epochs/<epochKey>
 ```
 > Make sure to replace the epochKey with a specific Epoch as shown below:
 > ```bash
@@ -184,6 +306,32 @@ If done properly, the output should look similar to this:
   }
 }
 ```
+> A message will appear if the data is empty or doesn't exist yet.
+
+## To print the location of a specific Epoch, run this command:
+```bash
+$ curl localhost:5000/epochs/2023-063T12:00:00.000Z/location
+```
+If done properly, the output should look similar to this:
+```
+{
+  "Epoch": "2023-082T12:00:00.000Z",
+  "Location": {
+    "altitude": {
+      "units": "km",
+      "value": 426.493361256541
+    },
+    "latitude": 3.693612400678767,
+    "longitude": 67.77071661260686
+  },
+  "geo": "The ISS must be over an ocean...",
+  "speed": {
+    "units": "km/s",
+    "value": 7.6603442162552815
+  }
+}
+```
+> A message will appear if the data is empty or doesn't exist yet.
 
 ## To print the speed of a specific Epoch, run this command:
 ```bash
@@ -191,8 +339,14 @@ $ curl localhost:5000/epochs/2023-063T12:00:00.000Z/speed
 ```
 If done properly, the output should look similar to this:
 ```
-Speed: 7.661757196327827 km/s
+{
+  "speed": {
+    "units": "km/s",
+    "value": 7.6603442162552815
+  }
+}
 ```
+> A message will appear if the data is empty or doesn't exist yet.
 
 # Describing the ISS Data:
 An Epoch is simply a point in time that the ISS is at. It is represented in 3D cartesian coordinates (X, Y, and Z components), as well the corresponding vector components (X_DOT, Y_DOT, and Z_DOT). The units of the coordinates are kilometers, while the vector components are in kilometers per second. Lastly, the Epoch Key (example: 2023-063T12:00:00.000Z) represents the year, date, and time, in that exact order.
