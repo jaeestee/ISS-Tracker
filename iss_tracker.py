@@ -141,7 +141,10 @@ def current_location() -> dict:
     timeNow = time.time()
     
     #finding the time for the first item in the list to use in the loop
-    timeEpoch = time.mktime(time.strptime(listOfEpochs[0][:-5], '%Y-%jT%H:%M:%S'))
+    try:
+        timeEpoch = time.mktime(time.strptime(listOfEpochs[0][:-5], '%Y-%jT%H:%M:%S'))
+    except Error as e:
+        return 'The data does not exist or is empty!\n'
     closestEpoch = listOfEpochs[0]
     previousDifference = abs(timeNow - timeEpoch)
     
