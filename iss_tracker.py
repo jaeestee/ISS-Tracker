@@ -252,12 +252,13 @@ def location(epoch: str) -> dict:
     try:
         #setting the x, y, z, units, and epoch key to its corresponding variables
         x = float(specificEpoch['X']['#text'])
-        y = float(specificEpoch['Y']['#text'])
-        z = float(specificEpoch['Z']['#text'])
-        units = specificEpoch['X']['@units']
-        epoch = specificEpoch['EPOCH']
     except TypeError:
         return 'The data seems to be empty or does not exist...\n'
+    
+    y = float(specificEpoch['Y']['#text'])
+    z = float(specificEpoch['Z']['#text'])
+    units = specificEpoch['X']['@units']
+    epoch = specificEpoch['EPOCH']
 
     #indexing part of the epoch key to find the hrs and mins
     hrs = int(epoch[9:11])
