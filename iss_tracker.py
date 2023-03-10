@@ -350,13 +350,22 @@ def help() -> str:
 
     helpOutput = '''usage: curl localhost:5000[<route>][?<query parameter>]\n
 The different possible routes:
-    /                                   Returns the entire data set
+    /post-data                          Loads/reloads the dictionary with data from the website
+    /delete-data                        Deletes all the data from the dictionary
+    
+    /                                   Returns the entire data set (if it exists)
+    /now                                Returns the current location of the ISS
     /epochs                             Returns the list of all Epochs in the data set
     /epochs/<epoch>                     Returns the state vectors for a specific Epoch from the data set
+    /epochs/<epoch>/location            Returns the location for a specific Epoch in the data set
     /epochs/<epoch>/speed               Returns the instantaneous speed for a specific Epoch in the data set
-    /help                               Returns the help text taht describes each route
-    /delete-data                        Deletes all the data from the dictionary
-    /post-data                          Reloads the dictionary with data from the website
+
+    /comment                            Returns the comments in the ISS data
+    /header                             Returns the header in the ISS data
+    /metadata                           Returns the metadata in the ISS data
+
+    /help                               Returns the help text that describes each route
+    
 
 The different query parameters (only works for the "/epochs" route):
     limit=<int>                         Returns a specific integer amount of Epochs from the data set
