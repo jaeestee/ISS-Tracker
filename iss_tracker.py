@@ -217,7 +217,7 @@ def specific_epoch_data(epoch: str) -> dict:
     try:
         #stores the entire epoch data by navigating through the entire data dictionary
         epochData = data()['ndm']['oem']['body']['segment']['data']['stateVector']
-    except TypeError:
+    except Error as e:
         return 'The data seems to be empty or does not exist...\n'
 
     #sorts through the list to match the epoch key and returns the data for it
