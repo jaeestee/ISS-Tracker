@@ -19,7 +19,7 @@
 - [Desribing the ISS Data](https://github.com/jaeestee/ISS-Tracker/blob/main/README.md#describing-the-iss-data)
   
 # ISS Complete Tracking
-This git repo contains the script ``iss_tracker.py``. This script is a flask application that is used to return data from the iss trajectory data. The data returned is explained in the sections below.
+This git repo contains the script ``iss_tracker.py``. This script is a flask application that is used to return data from the iss trajectory data. The data returned is explained in the sections below. An indepth writeup about the application is located in the ``ISS Tracking Application WriteUp.pdf`` file.
 
 ***iss_tracker.py***
 - This flask app contains functions that are called when queries are sent to the running app, therefore returning values that were requested. The functions are:
